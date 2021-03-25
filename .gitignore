@@ -1,0 +1,5 @@
+GraphQLClient/.vscode/
+GraphQLClient/bin/
+GraphQLClient/obj/
+Tests/GraphQLClient.UnitTests/bin
+Tests/GraphQLClient.UnitTests/obj
