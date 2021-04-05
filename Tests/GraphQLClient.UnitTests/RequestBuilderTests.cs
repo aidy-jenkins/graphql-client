@@ -1,15 +1,22 @@
 using System;
 using Xunit;
-using GraphQLClient;
+using GraphQlClient;
 
-namespace GraphQLClient.UnitTests
+namespace GraphQlClient.UnitTests
 {
     public class RequestBuilderTests
     {
+        private IGraphQlQueryBuilder _queryBuilder;
+
+        public RequestBuilderTests() 
+        {
+            _queryBuilder = new GraphQlQueryBuilder();
+        }
+
         [Fact]
         public void RequestBuilder_ShouldAcceptAnonymousType()
         {
-            Query.Build(new {
+            _queryBuilder.Build(new {
                 Aidys = new [] {
                     new {
                         Foo = 1
@@ -22,7 +29,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldReturnSimpleQuery()
         {
             var expectedQuery = "{id name}";
-            var request = Query.Build
+            var request = _queryBuilder.Build
             (
                 new {
                     Id = default(int),
@@ -37,7 +44,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldHandleObjectFieldSelection()
         {
             var expectedQuery = "{id foo{bar baz}}";
-            var request = Query.Build
+            var request = _queryBuilder.Build
             (
                 new {
                     Id = default(int),
@@ -55,7 +62,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldHandleCollections()
         {
             var expectedQuery = "{id foo{bar baz}}";
-            var request = Query.Build
+            var request = _queryBuilder.Build
             (
                 new {
                     Id = default(int),
@@ -75,7 +82,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldAllowParameters() 
         {
             var expectedQuery = "{foo(x:7)}";
-            var request = Query.Build(
+            var request = _queryBuilder.Build(
                 new {
                     Foo = default(int)
                 }
@@ -89,7 +96,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldAllowMultipleParameters() 
         {
             var expectedQuery = "{foo(x:7,bar:\"baz\",date:\"2021-03-19\")}";
-            var request = Query.Build(
+            var request = _queryBuilder.Build(
                 new {
                     Foo = default(int)
                 }
@@ -106,7 +113,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldSupportAliasingAField() 
         {
             var expectedQuery = "{foo:bar{id} bar{id}}";
-            var request = Query.Build(new {
+            var request = _queryBuilder.Build(new {
                 Foo = new {
                     Id = default(int)
                 },
@@ -124,7 +131,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldSupportAliasingAFieldWithParameters() 
         {
             var expectedQuery = "{foo:bar(id:7){id} bar:fubar(name:\"maxbar\"){id}}";
-            var request = Query.Build(new {
+            var request = _queryBuilder.Build(new {
                 Foo = new {
                     Id = default(int)
                 },
@@ -148,7 +155,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldAllowDefinedType() 
         {
             var expectedQuery = "{foo bar}";
-            var request = Query.Build<DefinedTypeTest>();
+            var request = _queryBuilder.Build<DefinedTypeTest>();
             
             Assert.Equal(expectedQuery, request.GetQuery());
         }
