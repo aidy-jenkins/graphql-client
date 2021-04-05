@@ -4,19 +4,37 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace GraphQLClient 
+namespace GraphQlClient 
 {
-    public static class Query 
+    public interface IGraphQlQueryBuilder 
     {
-        public static Query<T> Build<T>(T shape = default) => new Query<T>(shape);
+        IGraphQlQuery<T> Build<T>(T shape = default);
+    }
 
-        public static void RegisterScalarType(Type type) 
+    public interface IGraphQlQuery<T> 
+    {
+        string GetQuery();
+
+        IMetaMember Field<TOut>(Expression<Func<T, TOut>> fieldSelector);
+    }
+
+    public interface IMetaMember 
+    {
+        IMetaMember AddParameter(string parameterName, object parameterValue);
+        IMetaMember IsAliasFor(string fieldName);
+    }
+
+    public class GraphQlQueryBuilder : IGraphQlQueryBuilder
+    {
+        public IGraphQlQuery<T> Build<T>(T shape = default) => new GraphQlQuery<T>(shape, ScalarTypes);
+
+        public void RegisterScalarType(Type type) 
         {
             if(!ScalarTypes.Contains(type))
                 ScalarTypes.Add(type);
         }
 
-        internal static HashSet<Type> ScalarTypes = new HashSet<Type>
+        private HashSet<Type> ScalarTypes = new HashSet<Type>
         {
             typeof(int),
             typeof(short),
@@ -30,13 +48,18 @@ namespace GraphQLClient
         };
     }
 
-    public class Query<T>
+    public class GraphQlQuery<T> : IGraphQlQuery<T>
     {
         private Dictionary<MemberInfo, string> Aliases = new Dictionary<MemberInfo, string>();
         private Dictionary<MemberInfo, Dictionary<string, object>> Parameters = new Dictionary<MemberInfo, Dictionary<string, object>>();
 
+        private HashSet<Type> _scalarTypes;
+
         public T Shape { get; }
-        public Query(T shape) {}
+        public GraphQlQuery(T shape, HashSet<Type> scalarTypes) 
+        {
+            _scalarTypes = scalarTypes;
+        }
 
         private static IEnumerable<(string Name, Type Type, MemberInfo Member)> GetFields(Type type)
             => type.GetProperties()
@@ -44,8 +67,8 @@ namespace GraphQLClient
                 .Union(type.GetFields()
                     .Select(field => (field.Name, Type: field.FieldType, Member: field as MemberInfo)));
 
-        private static bool IsScalar(Type type) 
-            => Query.ScalarTypes.Contains(type);
+        private bool IsScalar(Type type) 
+            => _scalarTypes.Contains(type);
 
         private static string PascalToCamel(string s)
             => string.IsNullOrEmpty(s) ? s : string.Concat(s.First().ToString().ToLower(), string.Join(string.Empty, s.Skip(1)));
@@ -86,7 +109,12 @@ namespace GraphQLClient
             return $"{{{query}}}";
         }
 
-        public MetaMemberInfo Field<TOut>(Expression<Func<T, TOut>> fieldSelector)
+        public string GetQuery() 
+        {
+            return TypeQuery(typeof(T));
+        }
+
+        public IMetaMember Field<TOut>(Expression<Func<T, TOut>> fieldSelector)
         {
             var body = fieldSelector.Body as MemberExpression;
             if(body == null)
@@ -95,18 +123,13 @@ namespace GraphQLClient
             return new MetaMemberInfo { Member = body.Member, Query = this };
         }
 
-        public string GetQuery() 
+        public class MetaMemberInfo : IMetaMember
         {
-            return TypeQuery(typeof(T));
-        }
-
-        public class MetaMemberInfo 
-        {
-            public Query<T> Query {get; set;}
+            public GraphQlQuery<T> Query {get; set;}
 
             public MemberInfo Member {get; internal set;}
 
-            public MetaMemberInfo AddParameter(string name, object value) 
+            public IMetaMember AddParameter(string name, object value) 
             {
                 var parameters = Query.Parameters.GetValueOrDefault(Member);
                 if(parameters == null) 
@@ -120,7 +143,7 @@ namespace GraphQLClient
                 return this;
             }
 
-            public MetaMemberInfo IsAliasFor(string fieldName) 
+            public IMetaMember IsAliasFor(string fieldName) 
             {
                 Query.Aliases[this.Member] = fieldName;
                 return this;
