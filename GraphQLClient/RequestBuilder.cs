@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,7 +105,7 @@ namespace GraphQlClient
 
                 var fieldQuery = TypeQuery(field.Type);
                 
-                var parameters = string.Join(',', Parameters.GetValueOrDefault(field.Member)?.Select(x => $"{x.Key}:{Newtonsoft.Json.JsonConvert.SerializeObject(x.Value)}") ?? new string[0]);
+                var parameters = string.Join(',', Parameters.GetValueOrDefault(field.Member)?.Select(x => $"{x.Key}:{JsonConvert.SerializeObject(x.Value)}") ?? new string[0]);
                 if(!string.IsNullOrWhiteSpace(parameters))
                     parameters = $"({parameters})";
 
