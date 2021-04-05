@@ -148,7 +148,7 @@ namespace GraphQLClient.UnitTests
         public void RequestBuilder_ShouldAllowDefinedType() 
         {
             var expectedQuery = "{foo bar}";
-            var request = Query.Build<DefinedTypeTest>(null);
+            var request = Query.Build<DefinedTypeTest>();
             
             Assert.Equal(expectedQuery, request.GetQuery());
         }

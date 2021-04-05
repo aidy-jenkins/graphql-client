@@ -8,7 +8,7 @@ namespace GraphQLClient
 {
     public static class Query 
     {
-        public static Query<T> Build<T>(T shape) => new Query<T>(shape);
+        public static Query<T> Build<T>(T shape = default) => new Query<T>(shape);
     }
 
     public class Query<T>
