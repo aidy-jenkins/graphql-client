@@ -9,17 +9,14 @@ namespace GraphQLClient
     public static class Query 
     {
         public static Query<T> Build<T>(T shape = default) => new Query<T>(shape);
-    }
 
-    public class Query<T>
-    {
-        private Dictionary<MemberInfo, string> Aliases = new Dictionary<MemberInfo, string>();
-        private Dictionary<MemberInfo, Dictionary<string, object>> Parameters = new Dictionary<MemberInfo, Dictionary<string, object>>();
+        public static void RegisterScalarType(Type type) 
+        {
+            if(!ScalarTypes.Contains(type))
+                ScalarTypes.Add(type);
+        }
 
-        public T Shape { get; }
-        public Query(T shape) {}
-
-        public static HashSet<Type> ScalarTypes = new HashSet<Type>
+        internal static HashSet<Type> ScalarTypes = new HashSet<Type>
         {
             typeof(int),
             typeof(short),
@@ -31,6 +28,15 @@ namespace GraphQLClient
             typeof(bool),
             typeof(DateTime),
         };
+    }
+
+    public class Query<T>
+    {
+        private Dictionary<MemberInfo, string> Aliases = new Dictionary<MemberInfo, string>();
+        private Dictionary<MemberInfo, Dictionary<string, object>> Parameters = new Dictionary<MemberInfo, Dictionary<string, object>>();
+
+        public T Shape { get; }
+        public Query(T shape) {}
 
         private static IEnumerable<(string Name, Type Type, MemberInfo Member)> GetFields(Type type)
             => type.GetProperties()
@@ -39,10 +45,10 @@ namespace GraphQLClient
                     .Select(field => (field.Name, Type: field.FieldType, Member: field as MemberInfo)));
 
         private static bool IsScalar(Type type) 
-            => ScalarTypes.Contains(type);
+            => Query.ScalarTypes.Contains(type);
 
         private static string PascalToCamel(string s)
-            => string.Concat(s[0].ToString().ToLower(), string.Join(string.Empty, s.Skip(1)));
+            => string.IsNullOrEmpty(s) ? s : string.Concat(s.First().ToString().ToLower(), string.Join(string.Empty, s.Skip(1)));
 
         public string TypeQuery(Type type) 
         {
@@ -84,7 +90,7 @@ namespace GraphQLClient
         {
             var body = fieldSelector.Body as MemberExpression;
             if(body == null)
-                throw new ArgumentException("Unsupported");
+                throw new ArgumentException("Unsupported field selector expression");
 
             return new MetaMemberInfo { Member = body.Member, Query = this };
         }
