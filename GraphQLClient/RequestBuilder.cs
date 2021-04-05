@@ -67,8 +67,13 @@ namespace GraphQlClient
                 .Union(type.GetFields()
                     .Select(field => (field.Name, Type: field.FieldType, Member: field as MemberInfo)));
 
-        private bool IsScalar(Type type) 
-            => _scalarTypes.Contains(type);
+        private bool IsScalar(Type type)
+        {
+            if(type.IsEnum)
+                return true;
+
+            return _scalarTypes.Contains(type);
+        }
 
         private static string PascalToCamel(string s)
             => string.IsNullOrEmpty(s) ? s : string.Concat(s.First().ToString().ToLower(), string.Join(string.Empty, s.Skip(1)));
