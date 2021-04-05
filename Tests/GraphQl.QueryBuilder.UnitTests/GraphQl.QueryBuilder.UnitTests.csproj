@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GraphQlClient\GraphQlClient.csproj" />
+    <ProjectReference Include="..\..\GraphQl.QueryBuilder\GraphQl.QueryBuilder.csproj" />
   </ItemGroup>
 
 </Project>

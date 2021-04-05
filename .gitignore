@@ -1,6 +1,6 @@
 .vscode/
-GraphQlClient/.vscode/
-GraphQlClient/bin/
-GraphQlClient/obj/
-Tests/GraphQlClient.UnitTests/bin
-Tests/GraphQlClient.UnitTests/obj
+GraphQl.QueryBuilder/.vscode/
+GraphQl.QueryBuilder/bin/
+GraphQl.QueryBuilder/obj/
+Tests/GraphQl.QueryBuilder.UnitTests/bin
+Tests/GraphQl.QueryBuilder.UnitTests/obj
