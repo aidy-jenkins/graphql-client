@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <authors>Aidy Jenkins</authors>
     <description>Constructs GraphQL API queries from .NET objects and types</description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
