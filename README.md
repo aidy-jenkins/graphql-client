@@ -103,7 +103,7 @@ public async Task<User> GetTom()
 
 ### Dependencies
 
-No third party dependencies used, written in .NET 5
+Written in .NET 5, Newtonsoft.JSON used for serialising parameters, in future the serialisation will be exposed for more flexibility
 
 
 Uses xUnit and FluentAssertions for the test suite
