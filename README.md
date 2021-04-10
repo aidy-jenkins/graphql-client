@@ -102,4 +102,5 @@ public async Task<User> GetTom()
 ### Dependencies
 
 No third party dependencies used, written in .NET 5
+&nbsp;
 Uses xUnit and FluentAssertions for the test suite
