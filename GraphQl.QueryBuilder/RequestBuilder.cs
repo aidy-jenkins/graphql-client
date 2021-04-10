@@ -105,7 +105,7 @@ namespace GraphQlClient
 
                 var fieldQuery = TypeQuery(field.Type);
                 
-                var parameters = string.Join(',', Parameters.GetValueOrDefault(field.Member)?.Select(x => $"{x.Key}:{JsonConvert.SerializeObject(x.Value)}") ?? new string[0]);
+                var parameters = string.Join(',', Parameters.GetValueOrDefault(field.Member)?.Select(x => $"{x.Key}:{Serialise(x.Value)}") ?? new string[0]);
                 if(!string.IsNullOrWhiteSpace(parameters))
                     parameters = $"({parameters})";
 
@@ -113,6 +113,14 @@ namespace GraphQlClient
             }));
 
             return $"{{{query}}}";
+        }
+
+        private string Serialise(object value) 
+        {
+            if(value.GetType().IsEnum)
+                return value.ToString().ToUpperInvariant();
+
+            return JsonConvert.SerializeObject(value);
         }
 
         public string GetQuery() 
