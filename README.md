@@ -19,7 +19,7 @@ class User //Example query type
 IGraphQlQueryBuilder queryBuilder = new GraphQlQueryBuilder();
 var query = queryBuilder.Build<User>();
 
-//query is the string "{id name}"
+//query.GetQuery() is the string "{id name}"
 ```
 
 Supports anonymous types for inline definitions (this is particularly useful when writing tests)
@@ -61,7 +61,7 @@ var expectedResult = new
 
 var query = queryBuilder.Build(expectedResult);
 
-var actual = await SendRequest(query);
+var actual = await SendRequest(query.GetQuery());
 
 // assert expected equal to actual
 ```
@@ -83,7 +83,7 @@ public async Task<User> GetUser(int userId)
         .Field(q => q.User)
         .AddParameter("id", userId);
 
-    return (await SendRequest<UserQuery>(query)).User;
+    return (await SendRequest<UserQuery>(query.GetQuery())).User;
 }
 
 public async Task<User> GetTom()
@@ -95,7 +95,9 @@ public async Task<User> GetTom()
             .IsAliasFor("user")
             .AddParameter("name", "Tom");
 
-    return (await SendRequest(shape: tomShape)).Tom;
+    //query.GetQuery() is the string: {tom:user(name:"Tom"){ ... }}
+
+    return (await SendRequest(query.GetQuery(), shape: tomShape)).Tom;
 }
 ```
 
