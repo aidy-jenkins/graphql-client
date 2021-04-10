@@ -31,7 +31,8 @@ namespace GraphQlClient.UnitTests
             var expectedQuery = "{id name}";
             var request = _queryBuilder.Build
             (
-                new {
+                new 
+                {
                     Id = default(int),
                     Name = default(string)
                 }
