@@ -160,10 +160,32 @@ namespace GraphQlClient.UnitTests
             Assert.Equal(expectedQuery, request.GetQuery());
         }
 
-        class DefinedTypeTest {
+        [Fact]
+        public void RequestBuilder_ShouldHandleEnumParameters() 
+        {
+            var expectedQuery = "{foo(type:SOMEVALUE,otherType:SOMEOTHERVALUE)}";
+            var request = _queryBuilder.Build(new {
+                Foo = null as string[]
+            });
+
+            request.Field(q => q.Foo)
+                    .AddParameter("type", EnumTest.SomeValue)
+                    .AddParameter("otherType", EnumTest.SomeOtherValue);
+            
+            Assert.Equal(expectedQuery, request.GetQuery());
+        }
+
+        class DefinedTypeTest 
+        {
             public int Foo {get; set;} //property
 
             public string Bar; //field
+        }
+
+        enum EnumTest 
+        {
+            SomeValue,
+            SomeOtherValue
         }
     }
 }
